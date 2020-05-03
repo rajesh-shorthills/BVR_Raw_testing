@@ -26,7 +26,7 @@ no_reviewrating_files = []          # file names with no rating within a review 
 wrong_reviewDate_files = []         # file names with wrong review dates within a review along with number of times wrong
 wrong_rating_files = []             # file names with wrong rating langauge within a review  along with number of times wrong 
 wrong_ratingFormat_files = []             # file names with wrong rating langauge within a review  along with number of times wrong 
-
+less_reviewText_files = []
 for eachFile in json_files:
     try:
         with open(os.path.join(path_to_json, eachFile))  as f:
@@ -41,20 +41,23 @@ for eachFile in json_files:
         count_features = len(new_file['features'])
         count_rating = len(new_file['rating'])
         count_totalRatings = len(new_file['totalRatings'])
-        count_no_reviewText = 0             # number of reviewText missing in a particular file
-        count_no_reviewDate = 0             # number of reviewDate missing in a particular file
-        count_no_reviewTitle = 0            # number of reviewTitle missing in a particular file
-        count_no_reviewerName = 0           # number of reviewerName missing in a particular file
-        count_no_rating = 0                 # number of rating missing in a particular file
-        count_wrong_reviewDate = 0          # number of wrong review Dates in a particular file
-        count_wrong_rating = 0              # number of wrong rating language in a particular file
-        count_wrong_ratingFormat = 0        # number of wrong rating format in a particular file
+        count_no_reviewText = 0             # number of reviewText missing in a particular review
+        count_no_reviewDate = 0             # number of reviewDate missing in a particular review
+        count_no_reviewTitle = 0            # number of reviewTitle missing in a particular review
+        count_no_reviewerName = 0           # number of reviewerName missing in a particular review
+        count_no_rating = 0                 # number of rating missing in a particular review
+        count_wrong_reviewDate = 0          # number of wrong review Dates in a particular review
+        count_wrong_rating = 0              # number of wrong rating language in a particular review
+        count_wrong_ratingFormat = 0        # number of wrong rating format in a particular review
+        count_less_reviewText = 0           # number of reviewText less than 20 characters in a particular review
         if count_reviews == 0:
             no_review_files.append(eachFile)
         else:
             for eachReviewDict in new_file['reviews']:
                 if len(eachReviewDict["reviewText"])==0:
                     count_no_reviewText += 1
+                elif len(eachReviewDict["reviewText"]) < 20:
+                    count_less_reviewText += 1
                 if len(eachReviewDict["reviewDate"]) == 0:
                     count_no_reviewDate += 1
                 # else:
@@ -77,6 +80,8 @@ for eachFile in json_files:
                         count_wrong_ratingFormat += 1
         if count_no_reviewText != 0:
             no_reviewText_files.append([eachFile,count_no_reviewText])
+        if count_less_reviewText != 0:
+            less_reviewText_files.append([eachFile, count_less_reviewText])
         if count_no_reviewDate != 0:
             no_reviewDate_files.append([eachFile,count_no_reviewDate])
         if count_no_reviewTitle != 0:
@@ -105,7 +110,7 @@ for eachFile in json_files:
         if count_totalRatings == 0:
             no_totalRatings_files.append(eachFile)
 
-print(wrong_ratingFormat_files)
+print(less_reviewText_files)
 
 
 

@@ -31,6 +31,10 @@ for eachFile in json_files:
     try:
         with open(os.path.join(path_to_json, eachFile))  as f:
             new_file = json.load(f)
+    except ValueError as err:
+        count += 1
+        not_loaded_files.append(eachFile)
+    else:        
         loaded_files.append(new_file)
         count_reviews = len(new_file['reviews'])
         count_title = len(new_file['title'])
@@ -66,7 +70,7 @@ for eachFile in json_files:
                     count_no_rating += 1
                 elif " out of 5 stars" not in eachReviewDict["rating"]:
                     count_wrong_rating += 1
-                elif type(float(eachReviewDict["rating"])) != float:
+                elif type(float(eachReviewDict["rating"][0:3])) != float:
                     count_wrong_ratingFormat += 1
         if count_no_reviewText != 0:
             no_reviewText_files.append([eachFile,count_no_reviewText])
@@ -97,9 +101,6 @@ for eachFile in json_files:
                 no_rating_float_files.append(eachFile)
         if count_totalRatings == 0:
             no_totalRatings_files.append(eachFile)
-    except ValueError as err:
-        count += 1
-        not_loaded_files.append(eachFile)
 
 print(not_loaded_files)
 

@@ -70,8 +70,11 @@ for eachFile in json_files:
                     count_no_rating += 1
                 elif " out of 5 stars" not in eachReviewDict["rating"]:
                     count_wrong_rating += 1
-                elif type(float(eachReviewDict["rating"][0:3])) != float:
-                    count_wrong_ratingFormat += 1
+                else:
+                    try:
+                        type(float(eachReviewDict["rating"][0:3]))
+                    except ValueError as err:
+                        count_wrong_ratingFormat += 1
         if count_no_reviewText != 0:
             no_reviewText_files.append([eachFile,count_no_reviewText])
         if count_no_reviewDate != 0:
@@ -102,7 +105,7 @@ for eachFile in json_files:
         if count_totalRatings == 0:
             no_totalRatings_files.append(eachFile)
 
-print(not_loaded_files)
+print(wrong_ratingFormat_files)
 
 
 

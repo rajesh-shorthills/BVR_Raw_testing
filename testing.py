@@ -1,5 +1,6 @@
 import os, json
 import dateparser
+import csv
 path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/Data/laptop/raw/'
 #path_to_json = input("Enter the folder address containing json files: ")
 #json_files = [pos_json for pos_json in os.listdir(path_to_json)]
@@ -110,7 +111,16 @@ for eachFile in json_files:
         if count_totalRatings == 0:
             no_totalRatings_files.append(eachFile)
 
-print(less_reviewText_files)
+
+with open('file_list.csv','w', newline='') as file:
+    header = csv.DictWriter(file, fieldnames = ["Name"])
+    header.writeheader()
+    writer = csv.writer(file)
+    for eFile in json_files:
+        writer.writerow([eFile])
+
+
+
 
 
 

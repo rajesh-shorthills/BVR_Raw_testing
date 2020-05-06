@@ -82,6 +82,17 @@ def countingTotalRatings():
     data_totalRatings_flag = pd.DataFrame(d)
     return data_totalRatings_flag
 
+def floatRating():
+    floatRating_flag = []
+    for eachFile in loaded_full_files:
+        try:
+            float(eachFile['rating'])
+            floatRating_flag.append("Green")
+        except:
+            floatRating_flag.append("Yellow")
+    d = {"Name":loaded_files, "floatRating_flag": floatRating_flag}
+    data_totalRatings_flag = pd.DataFrame(d)
+    return data_totalRatings_flag
 
 def writingFile():
     start_time = time.time()
@@ -90,11 +101,13 @@ def writingFile():
     data_features_flag = countingFeatures()
     data_rating_flag = countingRating()
     data_totalRatings_flag = countingTotalRatings()
+    data_floatRating_flag = floatRating()
     file1 = pd.merge(data_loaded_flag, data_review_flag, on = "Name", how = "left")
     file2 = pd.merge(file1, data_title_flag, on = "Name", how = "left")
     file3 = pd.merge(file2, data_features_flag, on = "Name", how = "left")
     file4 = pd.merge(file3, data_rating_flag, on = "Name", how = "left")
-    final_flag = pd.merge(file4, data_totalRatings_flag, on = "Name", how = "left")
+    file5 = pd.merge(file4, data_totalRatings_flag, on = "Name", how = "left")
+    final_flag = pd.merge(file5, data_floatRating_flag, on = "Name", how = "left")
     final_flag.to_csv("file_list.csv")
     return time.time() - start_time
 

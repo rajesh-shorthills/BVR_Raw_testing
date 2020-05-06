@@ -3,6 +3,7 @@ import dateparser
 import csv
 import pandas as pd
 import time
+import datetime
 
 #path_to_json = input("Enter the folder address containing json files: ")
 #json_files = [pos_json for pos_json in os.listdir(path_to_json)]
@@ -169,13 +170,15 @@ def countFormatRating():
 
 def countReviewDate():
     countReviewDate_flag = []
+    today_date = datetime.datetime.now()
     for eachFile in loaded_full_files:
         count_GoodReviewDate = 0
         for eachReviewDict in eachFile['reviews']:
             if len(eachReviewDict["reviewDate"]) > 0:
                 try:
-                    dateparser.parse(eachReviewDict["reviewDate"], languages=['en']) #, date_formats=['%B %d %Y']
-                    count_GoodReviewDate += 1
+                    review_date = dateparser.parse(eachReviewDict["reviewDate"], languages=['en']) #, date_formats=['%B %d %Y']
+                    if today_date - review_date <183:
+                        count_GoodReviewDate += 1
                 except:
                     pass
             if count_GoodReviewDate > 10:
@@ -212,9 +215,11 @@ def writingFile():
     file9 = pd.merge(file8, data_reviewerName_flag, on= "Name", how = "left")
     file10 = pd.merge(file9, data_formatRating_flag, on= "Name", how = "left")
     final_flag = pd.merge(file10, data_reviewDate_flag, on = "Name", how = "left")
+    
     final_flag.to_csv("file_list.csv")
-    return time.time() - start_time
+    return time.time() - start_time, final_flag
 
 
-f = writingFile()
+f = writingFile()[1].iloc[1]
 print(f)
+

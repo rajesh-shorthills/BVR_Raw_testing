@@ -252,22 +252,35 @@ def combiningRedReviews():
     redDict = defaultdict(list)
     for dict in list_of_flags:
         for key, value in dict.items():
-            redDict[key].append(value)
+            if value not in redDict[key]:
+                redDict[key].append(value)
     return redDict
 #July 30, 2017
     # return dict[redDict]
 
 def countingNonRedReviews():
-    counting = {}
     red_Reviews = combiningRedReviews()
-    for filename in loaded_files:
+    nonRedRating_flag = []
+    for (filename, eachFile) in zip(loaded_files, loaded_full_files):
+        count_totalReviews = len(eachFile['reviews'])
+        count_redReviews = 0
         if filename in red_Reviews:
-            counting[filename] = max(len(red_Reviews[filename]), len(red_Reviews[filename][0]))
-            # counting.append(len(red_Reviews[filename][0]))
-    return counting
+            count_redReviews = max(len(red_Reviews[filename]), len(red_Reviews[filename][0]))
+        count_greenReviews = count_totalReviews - count_redReviews
+        if count_greenReviews == 0:
+            nonRedRating_flag.append("Red")
+        elif count_greenReviews < 10:
+            nonRedRating_flag.append("Yellow")
+        else:
+            nonRedRating_flag.append("Green")
+    d = {"Name":loaded_files, "nonRedRating_flag": nonRedRating_flag}
+    data_nonRedrating_flag = pd.DataFrame(d)
+    return data_nonRedrating_flag
 
-f = combiningRedReviews()
-# f = countingNonRedReviews()
+
+
+# f = combiningRedReviews()
+f = countingNonRedReviews()
 #f = len(set(countNonRedReviews()) & set(loaded_files))
 #f = len(set(loaded_files) - set(countNonRedReviews()))
 print(f)

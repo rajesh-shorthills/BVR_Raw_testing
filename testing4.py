@@ -310,27 +310,6 @@ def combiningGreenReviews():
         green_loaded_full_files.append(eachFile)
     return green_loaded_full_files
 
-
-
-
-# def populating():
-#     original_file = loaded_full_files
-#     newone_file = combiningNonRedReviews()
-#     original = []
-#     newone = []
-#     for (ef1,ef2) in zip(original_file, newone_file):
-#         original.append(len(ef1["reviews"]))
-#         newone.append(len(ef2["reviews"]))
-#     d1 = {"Name":loaded_files, "original": original}
-#     d2 = {"Name":loaded_files, "new": newone}
-#     data1 = pd.DataFrame(d1)
-#     data2 = pd.DataFrame(d2)
-#     final_data = pd.merge(data1, data2, on = "Name", how = "left")
-#     final_data.to_csv("green.csv")
-#     return "Done"
-#     data_nonRedrating_flag = pd.DataFrame(d)
-
-
 def countingNonRedReviews():
     red_Reviews = combiningRedReviews()
     nonRedRating_flag = []
@@ -406,7 +385,6 @@ def findingDuplicates():
             else:
                 count_duplicate += 1
                 new_list.append(eachDict)
-                # new_dict[filename].append(eachDict)
         if count_duplicate > 0:
             duplicate_flag.append("Yellow")
             duplicate_dict[filename] = new_list

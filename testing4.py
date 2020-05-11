@@ -5,6 +5,7 @@ import pandas as pd
 import time
 import datetime
 from collections import defaultdict
+import copy
 #path_to_json = input("Enter the folder address containing json files: ")
 #json_files = [pos_json for pos_json in os.listdir(path_to_json)]
 path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/Data/laptop1/raw/'
@@ -30,6 +31,7 @@ for eachFile in json_files:
         loaded_flag.append("Red")
 d = {"Name": json_files, "loaded_flag":loaded_flag}
 data_loaded_flag = pd.DataFrame(d)
+deepCopy_loaded_full_files = copy.deepcopy(loaded_full_files)
 
 
 '''
@@ -46,6 +48,7 @@ def missingReviewText():
         if missingReviewText_flag != []:
             missingReviewTextTotal_flag[filename] = missingReviewText_flag
     return missingReviewTextTotal_flag, "Red"
+
 
 def missingReviewDate():
     missingReviewDateTotal_flag = {}
@@ -255,8 +258,55 @@ def combiningRedReviews():
             if value not in redDict[key]:
                 redDict[key].append(value)
     return redDict
-#July 30, 2017
-    # return dict[redDict]
+
+def combiningNonRedReviews():
+    missing_ReviewText = missingReviewText()
+    missing_ReviewDate = missingReviewDate()
+    missing_ReviewTitle = missingReviewTitle()
+    missing_ReviewerName = missingReviewerName()
+    wrong_ReviewDate = wrongReviewDate()
+    missing_Rating = missingRating()
+    wrong_FormatRating = wrongFormatRating()
+    less_ReviewText = lessReviewText()
+    new_loaded_full_files = deepCopy_loaded_full_files
+    list_of_flags = []
+    nonRed_loaded_full_files = []
+    for eachList in (missing_ReviewText, missing_ReviewDate, missing_ReviewTitle, missing_ReviewerName, wrong_ReviewDate, missing_Rating, wrong_FormatRating, less_ReviewText):
+        if eachList[1] == "Red":
+            list_of_flags.append(eachList[0])
+    list_of_flags = tuple(list_of_flags)
+    for (filename, eachFile) in zip(loaded_files, new_loaded_full_files):
+        for eachMember in list_of_flags:
+            if filename in eachMember:
+                for eachReview in eachMember[filename]:
+                    try:
+                        eachFile['reviews'].remove(eachReview)
+                    except:
+                        pass
+        nonRed_loaded_full_files.append(eachFile)
+    return nonRed_loaded_full_files
+
+
+
+
+
+# def populating():
+#     original_file = loaded_full_files
+#     newone_file = combiningNonRedReviews()
+#     original = []
+#     newone = []
+#     for (ef1,ef2) in zip(original_file, newone_file):
+#         original.append(len(ef1["reviews"]))
+#         newone.append(len(ef2["reviews"]))
+#     d1 = {"Name":loaded_files, "original": original}
+#     d2 = {"Name":loaded_files, "new": newone}
+#     data1 = pd.DataFrame(d1)
+#     data2 = pd.DataFrame(d2)
+#     final_data = pd.merge(data1, data2, on = "Name", how = "left")
+#     final_data.to_csv("green.csv")
+#     return "Done"
+#     data_nonRedrating_flag = pd.DataFrame(d)
+
 
 def countingNonRedReviews():
     red_Reviews = combiningRedReviews()
@@ -275,15 +325,29 @@ def countingNonRedReviews():
             nonRedRating_flag.append("Green")
     d = {"Name":loaded_files, "nonRedRating_flag": nonRedRating_flag}
     data_nonRedrating_flag = pd.DataFrame(d)
+    data_nonRedrating_flag.to_csv("file_nonRed.csv")
     return data_nonRedrating_flag
 
+def countingNonRedReviews2(): # does the same thing but doesn't keep the Red Reviews
+    nonRed_loaded_full_files = combiningNonRedReviews()
+    nonRed_flag = []
+    for eachFile in nonRed_loaded_full_files:
+        if len(eachFile['reviews']) == 0:
+            nonRed_flag.append("Red")
+        elif len(eachFile['reviews']) < 10:
+            nonRed_flag.append("Yellow")
+        else:
+            nonRed_flag.append("Green")
+    d = {"Name":loaded_files, "nonRed_flag": nonRed_flag}
+    data_nonRed_flag = pd.DataFrame(d)
+    data_nonRed_flag.to_csv("file_nonRed2.csv")
+    return "Done"
 
 
-# f = combiningRedReviews()
-f = countingNonRedReviews()
-#f = len(set(countNonRedReviews()) & set(loaded_files))
-#f = len(set(loaded_files) - set(countNonRedReviews()))
+f = countingNonRedReviews2()
 print(f)
+
+
 '''
 
 def writingFile():

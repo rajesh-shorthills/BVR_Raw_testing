@@ -123,8 +123,11 @@ def wrongFormatRating():
     for (eachFile, filename) in zip(loaded_full_files, loaded_files):
         wrongFormatRating_flag = []
         for eachReviewDict in eachFile['reviews']:
-            if " out of 5 stars" not in eachReviewDict["rating"]:
-                wrongFormatRating_flag.append(eachReviewDict)
+            if " out of 5 stars" not in eachReviewDict["rating"] or " out of 5" not in eachReviewDict["rating"]:
+                try:
+                    type(float(eachReviewDict["rating"][0:3]))
+                except:
+                    wrongFormatRating_flag.append(eachReviewDict)
             else:
                 try:
                     type(float(eachReviewDict["rating"][0:3]))

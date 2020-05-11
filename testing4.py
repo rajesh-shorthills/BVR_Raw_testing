@@ -9,9 +9,10 @@ import datetime
 #json_files = [pos_json for pos_json in os.listdir(path_to_json)]
 path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/Data/laptop/raw/'
 
-''' 
-Product
 '''
+Product - Reading file - Red
+'''
+
 json_files = [pos_json for pos_json in os.listdir(path_to_json) if pos_json.endswith('.json')]
 not_loaded_files = []
 loaded_files = []
@@ -29,6 +30,132 @@ for eachFile in json_files:
         loaded_flag.append("Red")
 d = {"Name": json_files, "loaded_flag":loaded_flag}
 data_loaded_flag = pd.DataFrame(d)
+
+
+'''
+Reviews - Red
+'''
+
+def missingReviewText():
+    missingReviewTextTotal_flag = {}
+    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
+        missingReviewText_flag = []
+        for eachReviewDict in eachFile['reviews']:
+            if len(eachReviewDict["reviewText"]) == 0:
+                missingReviewText_flag.append(eachReviewDict)
+        if missingReviewText_flag != []:
+            missingReviewTextTotal_flag[filename] = missingReviewText_flag
+    return missingReviewTextTotal_flag
+
+def missingReviewDate():
+    missingReviewDateTotal_flag = {}
+    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
+        missingReviewDate_flag = []
+        for eachReviewDict in eachFile['reviews']:
+            if len(eachReviewDict["reviewDate"]) == 0:
+                missingReviewDate_flag.append(eachReviewDict)
+        if missingReviewDate_flag != []:
+            missingReviewDateTotal_flag[filename] = missingReviewDate_flag
+    return missingReviewDateTotal_flag
+
+
+'''
+Reviews - Red later yellow
+'''
+
+def missingReviewTitle():
+    missingReviewTitleTotal_flag = {}
+    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
+        missingReviewTitle_flag = []
+        for eachReviewDict in eachFile['reviews']:
+            if len(eachReviewDict["reviewTitle"]) == 0:
+                missingReviewTitle_flag.append(eachReviewDict)
+        if missingReviewTitle_flag != []:
+            missingReviewTitleTotal_flag[filename] = missingReviewTitle_flag
+    return missingReviewTitleTotal_flag
+
+def missingReviewerName():
+    missingReviewerNameTotal_flag = {}
+    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
+        missingReviewerName_flag = []
+        for eachReviewDict in eachFile['reviews']:
+            if len(eachReviewDict["reviewerName"]) == 0:
+                missingReviewerName_flag.append(eachReviewDict)
+        if missingReviewerName_flag != []:
+            missingReviewerNameTotal_flag[filename] = missingReviewerName_flag
+    return missingReviewerNameTotal_flag
+
+def missingRating():
+    missingRatingTotal_flag = {}
+    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
+        missingRating_flag = []
+        for eachReviewDict in eachFile['reviews']:
+            if len(eachReviewDict["rating"]) == 0:
+                missingRating_flag.append(eachReviewDict)
+        if missingRating_flag != []:
+            missingRatingTotal_flag[filename] = missingRating_flag
+    return missingRatingTotal_flag
+
+'''
+Reviews - Red
+'''
+
+def wrongReviewDate():
+    wrongReviewDateTotal_flag = {}
+    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
+        wrongReviewDate_flag = []
+        for eachReviewDict in eachFile['reviews']:
+            try:
+                dateparser.parse(eachReviewDict["reviewDate"], languages=['en'])
+            except:
+                wrongReviewDate_flag.append(eachReviewDict)
+        if wrongReviewDate_flag != []:
+            wrongReviewDateTotal_flag[filename] = wrongReviewDate_flag
+    return wrongReviewDateTotal_flag
+
+
+'''
+Review - Yellow
+'''
+
+def wrongFormatRating():
+    wrongFormatRatingTotal_flag = {}
+    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
+        wrongFormatRating_flag = []
+        for eachReviewDict in eachFile['reviews']:
+            if " out of 5 stars" not in eachReviewDict["rating"]:
+                wrongFormatRating_flag.append(eachReviewDict)
+            else:
+                try:
+                    type(float(eachReviewDict["rating"][0:3]))
+                except:
+                    wrongFormatRating_flag.append(eachReviewDict)
+        if wrongFormatRating_flag != []:
+            wrongFormatRatingTotal_flag[filename] = wrongFormatRating_flag
+    return wrongFormatRatingTotal_flag
+
+def lessReviewText():
+    lessReviewTextTotal_flag = {}
+    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
+        lessReviewText_flag = []
+        for eachReviewDict in eachFile['reviews']:
+            if len(eachReviewDict["reviewText"]) < 20 or len(eachReviewDict["reviewText"].split()) < 5:
+                lessReviewText_flag.append(eachReviewDict)
+        if lessReviewText_flag != []:
+            lessReviewTextTotal_flag[filename] = lessReviewText_flag
+    return lessReviewTextTotal_flag
+
+
+
+
+
+
+
+
+
+''' 
+Product
+'''
 
 def countingReviews():
     review_flag = []    
@@ -98,80 +225,43 @@ def floatRating():
     return data_floatRating_flag
 
 
-'''
-Reviews - Red
-'''
 
-def missingReviewText():
-    missingReviewTextTotal_flag = {}
-    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
-        missingReviewText_flag = []
-        for eachReviewDict in eachFile['reviews']:
-            if len(eachReviewDict["reviewText"]) == 0:
-                missingReviewText_flag.append(eachReviewDict)
-        if missingReviewText_flag != []:
-            missingReviewTextTotal_flag[filename] = missingReviewText_flag
-    return missingReviewTextTotal_flag
 
-def missingReviewDate():
-    missingReviewDateTotal_flag = {}
-    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
-        missingReviewDate_flag = []
-        for eachReviewDict in eachFile['reviews']:
-            if len(eachReviewDict["reviewDate"]) == 0:
-                missingReviewDate_flag.append(eachReviewDict)
-        if missingReviewDate_flag != []:
-            missingReviewDateTotal_flag[filename] = missingReviewDate_flag
-    return missingReviewDateTotal_flag
 
-def wrongReviewDate():
-    start_time = time.time()
-    wrongReviewDateTotal_flag = {}
-    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
-        wrongReviewDate_flag = []
-        for eachReviewDict in eachFile['reviews']:
-            try:
-                dateparser.parse(eachReviewDict["reviewDate"], languages=['en'])
-            except:
-                wrongReviewDate_flag.append(eachReviewDict)
-        if wrongReviewDate_flag != []:
-            wrongReviewDateTotal_flag[filename] = wrongReviewDate_flag
-    return wrongReviewDateTotal_flag, time.time() - start_time
 
-f = wrongReviewDate()[1]
 
 '''
-Reviews - Red later yellow
+Product - Yellow
 '''
+#5. number of non-RED reviews less than a configurable threshold / YELLOW
 
-def missingReviewTitle():
-    missingReviewTitleTotal_flag = {}
-    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
-        missingReviewTitle_flag = []
-        for eachReviewDict in eachFile['reviews']:
-            if len(eachReviewDict["reviewTitle"]) == 0:
-                missingReviewTitle_flag.append(eachReviewDict)
-        if missingReviewTitle_flag != []:
-            missingReviewTitleTotal_flag[filename] = missingReviewTitle_flag
-    return missingReviewTitleTotal_flag
-
-
-def missingRating():
-    missingRatingTotal_flag = {}
-    for (eachFile, filename) in zip(loaded_full_files, loaded_files):
-        missingRating_flag = []
-        for eachReviewDict in eachFile['reviews']:
-            if len(eachReviewDict["rating"]) == 0:
-                missingRating_flag.append(eachReviewDict)
-        if missingRating_flag != []:
-            missingRatingTotal_flag[filename] = missingRating_flag
-    return missingRatingTotal_flag
-
-'''
-Review - Yellow
-'''
+    
+    # for eachFile in loaded_full_files:
+    #     if len(eachFile['reviews']) == 0:
+    #         review_flag.append("Red")
+    #     else:
+    #         review_flag.append("Green")
+    # d = {"Name":loaded_files, "review_flag": review_flag}
+    # data_review_flag = pd.DataFrame(d)
+    # return data_review_flag
 
 
+
+# def countNonRedReviews():
+#     nonRedreview_flag = []    
+#     for (eachFile, fileName) in zip(loaded_full_files,loaded_files):
+#         try:
+#             new_file = lessReviewText()[fileName]
+#             len(new_file[])
+#     max_f = []
+#     for key, value in max_file.items():
+#         max_f.append(key)
+#     return max_f
+    
+
+f = lessReviewText()
+#f = len(set(countNonRedReviews()) & set(loaded_files))
+#f = len(set(loaded_files) - set(countNonRedReviews()))
 
 '''
 def countReviewText():

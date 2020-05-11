@@ -149,15 +149,8 @@ def lessReviewText():
     return lessReviewTextTotal_flag
 
 
-
-
-
-
-
-
-
 ''' 
-Product
+Product - Red
 '''
 
 def countingReviews():
@@ -170,6 +163,10 @@ def countingReviews():
     d = {"Name":loaded_files, "review_flag": review_flag}
     data_review_flag = pd.DataFrame(d)
     return data_review_flag
+
+'''
+Product - Yellow
+'''
 
 def countingTitle():
     title_flag = []    
@@ -214,6 +211,10 @@ def countingTotalRatings():
     d = {"Name":loaded_files, "totalRatings_flag": totalRatings_flag}
     data_totalRatings_flag = pd.DataFrame(d)
     return data_totalRatings_flag
+
+'''
+Product - Yellow
+'''
 
 def floatRating():
     floatRating_flag = []

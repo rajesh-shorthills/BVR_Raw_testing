@@ -32,6 +32,7 @@ for eachFile in json_files:
 d = {"Name": json_files, "loaded_flag":loaded_flag}
 data_loaded_flag = pd.DataFrame(d)
 deepCopy_loaded_full_files = copy.deepcopy(loaded_full_files)
+deepCopy_green_loaded_full_files = copy.deepcopy(loaded_full_files)
 
 
 '''
@@ -286,6 +287,28 @@ def combiningNonRedReviews():
         nonRed_loaded_full_files.append(eachFile)
     return nonRed_loaded_full_files
 
+def combiningGreenReviews():
+    missing_ReviewText = missingReviewText()
+    missing_ReviewDate = missingReviewDate()
+    missing_ReviewTitle = missingReviewTitle()
+    missing_ReviewerName = missingReviewerName()
+    wrong_ReviewDate = wrongReviewDate()
+    missing_Rating = missingRating()
+    wrong_FormatRating = wrongFormatRating()
+    less_ReviewText = lessReviewText()
+    new_loaded_full_files = deepCopy_green_loaded_full_files
+    list_of_flags = (missing_ReviewText, missing_ReviewDate, missing_ReviewTitle, missing_ReviewerName, wrong_ReviewDate, missing_Rating, wrong_FormatRating, less_ReviewText)
+    green_loaded_full_files = []
+    for (filename, eachFile) in zip(loaded_files, new_loaded_full_files):
+        for eachMember in list_of_flags:
+            if filename in eachMember:
+                for eachReview in eachMember[filename]:
+                    try:
+                        eachFile['reviews'].remove(eachReview)
+                    except:
+                        pass
+        green_loaded_full_files.append(eachFile)
+    return green_loaded_full_files
 
 
 
@@ -344,7 +367,59 @@ def countingNonRedReviews2(): # does the same thing but doesn't keep the Red Rev
     return "Done"
 
 
-f = countingNonRedReviews2()
+def greenReviewDates():
+    green_loaded_full_files = combiningGreenReviews()
+    countReviewDate_flag = []
+    today_date = datetime.datetime.now()
+    for eachFile in green_loaded_full_files:
+        count_GoodReviewDate = 0
+        for eachReviewDict in eachFile['reviews']:
+            if len(eachReviewDict["reviewDate"]) > 0:
+                try:
+                    review_date = dateparser.parse(eachReviewDict["reviewDate"], languages=['en']) #, date_formats=['%B %d %Y']
+                    days_up = today_date - review_date 
+                    if days_up.days < 183:
+                        count_GoodReviewDate += 1
+                except:
+                    pass
+            if count_GoodReviewDate > 10:
+                break
+        if count_GoodReviewDate > 10:
+            countReviewDate_flag.append("Green")
+        else:
+            countReviewDate_flag.append("Yellow")
+    d = {"Name":loaded_files, "countReviewDate_flag": countReviewDate_flag}
+    data_reviewDate_flag = pd.DataFrame(d)
+    return data_reviewDate_flag
+
+def findingDuplicates():
+    duplicate_flag = []
+    duplicate_dict = {}
+    for (filename, eachFile) in zip(loaded_files, loaded_full_files):
+        new_set = set()
+        count_duplicate = 0
+        new_list = []
+        for eachDict in eachFile["reviews"]:
+            t = tuple(eachDict.items())
+            if t not in new_set:
+                new_set.add(t)
+            else:
+                count_duplicate += 1
+                new_list.append(eachDict)
+                # new_dict[filename].append(eachDict)
+        if count_duplicate > 0:
+            duplicate_flag.append("Yellow")
+            duplicate_dict[filename] = new_list
+        else:
+            duplicate_flag.append("Green")
+    d = {"Name":loaded_files, "duplicate_flag": duplicate_flag}
+    data_duplicate_flag = pd.DataFrame(d)
+    data_duplicate_flag.to_csv("duplicate.csv")
+    return duplicate_dict
+
+
+
+f = findingDuplicates()
 print(f)
 
 

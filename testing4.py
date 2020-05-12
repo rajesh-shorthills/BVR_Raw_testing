@@ -6,6 +6,7 @@ import time
 import datetime
 from collections import defaultdict
 import copy
+from functools import reduce
 #path_to_json = input("Enter the folder address containing json files: ")
 #json_files = [pos_json for pos_json in os.listdir(path_to_json)]
 path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/Data/laptop1/raw/'
@@ -327,7 +328,6 @@ def countingNonRedReviews():
             nonRedRating_flag.append("Green")
     d = {"Name":loaded_files, "nonRedRating_flag": nonRedRating_flag}
     data_nonRedrating_flag = pd.DataFrame(d)
-    data_nonRedrating_flag.to_csv("file_nonRed.csv")
     return data_nonRedrating_flag
 
 def countingNonRedReviews2(): # does the same thing but doesn't keep the Red Reviews
@@ -342,8 +342,7 @@ def countingNonRedReviews2(): # does the same thing but doesn't keep the Red Rev
             nonRed_flag.append("Green")
     d = {"Name":loaded_files, "nonRed_flag": nonRed_flag}
     data_nonRed_flag = pd.DataFrame(d)
-    data_nonRed_flag.to_csv("file_nonRed2.csv")
-    return "Done"
+    return data_nonRed_flag
 
 
 def greenReviewDates():
@@ -368,8 +367,34 @@ def greenReviewDates():
         else:
             countReviewDate_flag.append("Yellow")
     d = {"Name":loaded_files, "countReviewDate_flag": countReviewDate_flag}
-    data_reviewDate_flag = pd.DataFrame(d)
-    return data_reviewDate_flag
+    data_ReviewDateGreen_flag = pd.DataFrame(d)
+    return data_ReviewDateGreen_flag
+
+def nonRedReviewDates():
+    nonRed_loaded_full_files = combiningNonRedReviews()
+    countReviewDate_flag = []
+    today_date = datetime.datetime.now()
+    for eachFile in nonRed_loaded_full_files:
+        count_GoodReviewDate = 0
+        for eachReviewDict in eachFile['reviews']:
+            if len(eachReviewDict["reviewDate"]) > 0:
+                try:
+                    review_date = dateparser.parse(eachReviewDict["reviewDate"], languages=['en']) #, date_formats=['%B %d %Y']
+                    days_up = today_date - review_date 
+                    if days_up.days < 183:
+                        count_GoodReviewDate += 1
+                except:
+                    pass
+            if count_GoodReviewDate > 10:
+                break
+        if count_GoodReviewDate > 10:
+            countReviewDate_flag.append("Green")
+        else:
+            countReviewDate_flag.append("Yellow")
+    d = {"Name":loaded_files, "countReviewDate_flag": countReviewDate_flag}
+    data_nonRedReviewDate_flag = pd.DataFrame(d)
+    return data_nonRedReviewDate_flag
+
 
 def findingDuplicates():
     duplicate_flag = []
@@ -392,12 +417,54 @@ def findingDuplicates():
             duplicate_flag.append("Green")
     d = {"Name":loaded_files, "duplicate_flag": duplicate_flag}
     data_duplicate_flag = pd.DataFrame(d)
-    data_duplicate_flag.to_csv("duplicate.csv")
-    return duplicate_dict
+    return data_duplicate_flag
+
+def productLabel(row):
+    if row['loaded_flag'] == "Red" or row['review_flag'] == "Red" or	row['title_flag'] == "Red" or	row['features_flag'] == "Red" or	row['rating_flag'] == "Red" or	row['totalRatings_flag'] == "Red" or	row['floatRating_flag'] == "Red" or	row['nonRedRating_flag'] == "Red" or	row['countReviewDate_flag_x'] == "Red" or	row['countReviewDate_flag_y'] == "Red" or	row['duplicate_flag'] == "Red":
+        return "Red"
+    elif row['loaded_flag'] == "Yellow" or row['review_flag'] == "Yellow" or	row['title_flag'] == "Yellow" or	row['features_flag'] == "Yellow" or	row['rating_flag'] == "Yellow" or	row['totalRatings_flag'] == "Yellow" or	row['floatRating_flag'] == "Yellow" or	row['nonRedRating_flag'] == "Yellow" or	row['countReviewDate_flag_x'] == "Yellow" or	row['countReviewDate_flag_y'] == "Yellow" or	row['duplicate_flag'] == "Yellow":
+        return "Yellow"
+    return "Green"
 
 
+def finalResult():
+    start_time = time.time()
+    data_review_flag =  countingReviews()
+    data_title_flag =  countingTitle()
+    data_features_flag =  countingFeatures()
+    data_rating_flag  =  countingRating()
+    data_totalRatings_flag  =  countingTotalRatings()
+    data_floatRating_flag =   floatRating()
+    data_nonRedrating_flag  =  countingNonRedReviews()
+    data_ReviewDateGreen_flag  =  greenReviewDates()
+    data_duplicate_flag  =  findingDuplicates()
+    data_nonRedReviewDate_flag = nonRedReviewDates()
+    dfs = [data_loaded_flag,
+                data_review_flag, 
+                data_title_flag, 
+                data_features_flag, 
+                data_rating_flag, 
+                data_totalRatings_flag, 
+                data_floatRating_flag, 
+                data_nonRedrating_flag, 
+                data_ReviewDateGreen_flag, 
+                data_nonRedReviewDate_flag, 
+                data_duplicate_flag]
+    df_final = reduce(lambda left,right: pd.merge(left,right,on='Name'), dfs)
+    df_final["productLabel"] = df_final.apply(lambda row: productLabel(row), axis = 1)
+    count_RedProduct = df_final.loc[df_final.productLabel == "Red", "productLabel"].count()
+    total_products = len(df_final.index)
+    if total_products == count_RedProduct:
+        category_label = "Red"
+    elif total_products - count_RedProduct < 10:
+        category_label = "Yellow"
+    else:
+        category_label = "Green"
+    df_final.to_csv(category_label+".csv")
+    return time.time() - start_time
 
-f = findingDuplicates()
+
+f = finalResult()
 print(f)
 
 

@@ -466,38 +466,3 @@ def finalResult():
 
 f = finalResult()
 print(f)
-
-
-'''
-
-def writingFile():
-    start_time = time.time()
-    data_review_flag = countingReviews()
-    data_title_flag = countingTitle()
-    data_features_flag = countingFeatures()
-    data_rating_flag = countingRating()
-    data_totalRatings_flag = countingTotalRatings()
-    data_floatRating_flag = floatRating()
-    data_reviewText_flag = countReviewText()
-    data_reviewTitle_flag = countReviewTitle()
-    data_reviewerName_flag = countReviewerName()
-    data_formatRating_flag = countFormatRating()
-    data_reviewDate_flag = countReviewDate()
-    file1 = pd.merge(data_loaded_flag, data_review_flag, on = "Name", how = "left")
-    file2 = pd.merge(file1, data_title_flag, on = "Name", how = "left")
-    file3 = pd.merge(file2, data_features_flag, on = "Name", how = "left")
-    file4 = pd.merge(file3, data_rating_flag, on = "Name", how = "left")
-    file5 = pd.merge(file4, data_totalRatings_flag, on = "Name", how = "left")
-    file6 = pd.merge(file5, data_floatRating_flag, on = "Name", how = "left")
-    file7 = pd.merge(file6, data_reviewText_flag, on = "Name", how = "left")
-    file8 = pd.merge(file7, data_reviewTitle_flag, on= "Name", how = "left")
-    file9 = pd.merge(file8, data_reviewerName_flag, on= "Name", how = "left")
-    file10 = pd.merge(file9, data_formatRating_flag, on= "Name", how = "left")
-    final_flag = pd.merge(file10, data_reviewDate_flag, on = "Name", how = "left")
-    # for eachCol in final_flag:
-    #     final_flag.loc[final_flag[eachCol] == "Red", "Final1" ] = "Red"
-    #     final_flag.loc[final_flag[eachCol] == "Yellow", "Final2" ] = "Yellow"
-    #     final_flag.loc[final_flag[eachCol] == "Green", "Final3" ] = "Green"
-    final_flag.to_csv("file_list.csv")
-    return time.time() - start_time
-'''

@@ -513,8 +513,45 @@ def finalResult():
     df_final = reduce(lambda left,right: pd.merge(left,right,on='Name'), dfs)
     df_final["productLabel"] = df_final.apply(lambda row: productLabel(row), axis = 1)
 
-    
+    data_review_reason_flag =  countingReviews()[1]
+    data_title_reason_flag =  countingTitle()[1]
+    data_features_reason_flag =  countingFeatures()[1]
+    data_rating_reason_flag  =  countingRating()[1]
+    data_totalRatings_reason_flag  =  countingTotalRatings()[1]
+    data_floatRating_reason_flag =   floatRating()[1]
+    data_nonRedrating_reason_flag  =  countingNonRedReviews()[1]
+    data_ReviewDateGreen_reason_flag  =  greenReviewDates()[1]
+    data_duplicate_reason_flag  =  findingDuplicates()[1]
+    data_nonRedReviewDate_reason_flag = nonRedReviewDates()[1]
 
+    productLabel_list = df_final["productLabel"].tolist()
+    productLabel_reason = []
+    for eachElement in productLabel_list:
+        if eachElement == "Green":
+            productLabel_reason.append({"productLabel": "Green", "reason": ""})
+        elif eachElement == "Yellow":
+            productLabel_reason.append({"productLabel": "Yellow", "reason": "At least one of the flag is yellow and there is no Red"})
+        else:
+            productLabel_reason.append({"productLabel": "Red", "reason": "At least one of the flag is Red"})
+
+    d = {"Name":loaded_files, "productLabel_reason_flag": productLabel_reason}
+    data_productLabel_reason_flag = pd.DataFrame(d)
+
+
+    dfs2 = [
+    # data_loaded_reason_flag,
+            data_productLabel_reason_flag,
+            data_review_reason_flag, 
+            data_title_reason_flag, 
+            data_features_reason_flag, 
+            data_rating_reason_flag, 
+            data_totalRatings_reason_flag, 
+            data_floatRating_reason_flag, 
+            data_nonRedrating_reason_flag, 
+            data_ReviewDateGreen_reason_flag, 
+            data_nonRedReviewDate_reason_flag, 
+            data_duplicate_reason_flag]
+    df_final_reason = reduce(lambda left,right: pd.merge(left,right,on='Name'), dfs2)
 
     count_RedProduct = df_final.loc[df_final.productLabel == "Red", "productLabel"].count()
     total_products = len(df_final.index)
@@ -541,8 +578,8 @@ def finalResult():
 
     df_final = df_final[cols]
 
-    df_final.to_csv(category_label+".csv")
-
+    # df_final.to_csv(category_label+".csv")
+    df_final_reason.to_csv(category_label+".csv")
     # final_report2 =  pd.read_csv(category_label+".csv", index_col=0, squeeze=True, header=None).to_dict()
     # final_report2 = df_final.to_dict('dict')
     final_report2 = df_final.set_index('Name').T.to_dict('list')

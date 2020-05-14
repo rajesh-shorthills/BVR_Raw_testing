@@ -648,20 +648,7 @@ def finalResult():
     return time.time() - start_time
 
 
-# with open('data.txt', 'r') as outfile:
-#         abc = json.load(outfile)
 
-# final_report = {
-#         'category_slug': 'laptop',
-#         'status': "Green",
-#         "products": abc
-#     }
-# with open('data_final_check.txt', 'w') as outfile:
-#     json.dump(final_report, outfile)
-
-# final_report2 =  pd.read_csv("test.csv", index_col=0, squeeze=True, header=0).to_dict()
-# with open('data.txt', 'w') as outfile:
-#     json.dump(final_report2, outfile)
 
 f = finalResult()
 print(f)

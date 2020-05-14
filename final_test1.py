@@ -639,10 +639,10 @@ def finalResult():
         'status': category_label,
         "products": final_report2
     }
-    with open('data.txt', 'w') as outfile:
+    with open('data.json', 'w') as outfile:
         json.dump(final_report2, outfile)
 
-    with open('data_final.txt', 'w') as outfile:
+    with open('data_final.json', 'w') as outfile:
         json.dump(final_report, outfile)
 
     return time.time() - start_time

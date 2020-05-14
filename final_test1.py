@@ -36,6 +36,8 @@ deepCopy_loaded_full_files = copy.deepcopy(loaded_full_files)
 deepCopy_green_loaded_full_files = copy.deepcopy(loaded_full_files)
 
 
+
+
 '''
 Reviews - Red
 '''
@@ -49,7 +51,7 @@ def missingReviewText():
                 missingReviewText_flag.append(eachReviewDict)
         if missingReviewText_flag != []:
             missingReviewTextTotal_flag[filename] = missingReviewText_flag
-    json.dump(missingReviewTextTotal_flag, open("missingText.json", 'w'))
+    #json.dump(missingReviewTextTotal_flag, open("missingText.json", 'w'))
     return missingReviewTextTotal_flag, "Red"
 
 
@@ -288,7 +290,7 @@ def combiningRedReviews():
         for key, value in dict.items():
             if value not in redDict[key]:
                 redDict[key].append(value)
-    json.dump(redDict, open("red.json", 'w'))
+    #json.dump(redDict, open("red.json", 'w'))
     return redDict
 
 
@@ -499,7 +501,8 @@ def finalResult():
     data_ReviewDateGreen_flag  =  greenReviewDates()[0]
     data_duplicate_flag  =  findingDuplicates()[0]
     data_nonRedReviewDate_flag = nonRedReviewDates()[0]
-    dfs = [data_loaded_flag,
+    dfs = [
+        data_loaded_flag,
                 data_review_flag, 
                 data_title_flag, 
                 data_features_flag, 
@@ -511,6 +514,14 @@ def finalResult():
                 data_nonRedReviewDate_flag, 
                 data_duplicate_flag]
     df_final = reduce(lambda left,right: pd.merge(left,right,on='Name'), dfs)
+    
+    if not_loaded_files != []:
+        json_files_new  = copy.deepcopy(loaded_files)
+        for not_loaded in not_loaded_files:
+            test = df_final
+            df_final = test.append({"Name": not_loaded, "loaded_flag": "Red"}, ignore_index = True)
+            json_files_new.append(not_loaded)
+
     df_final["productLabel"] = df_final.apply(lambda row: productLabel(row), axis = 1)
 
     data_review_reason_flag =  countingReviews()[1]
@@ -533,14 +544,30 @@ def finalResult():
             productLabel_reason.append({"productLabel": "Yellow", "reason": "At least one of the flag is yellow and there is no Red"})
         else:
             productLabel_reason.append({"productLabel": "Red", "reason": "At least one of the flag is Red"})
+    
+    # df_final.to_csv("Green"+"2.csv")
+    loaded_flag_list = df_final["loaded_flag"].tolist()
+    data_loaded_reason_flag = []
+    for element in loaded_flag_list:
+        if element == "Green":
+            data_loaded_reason_flag.append({"loaded_flag": "Green", "reason": ""})
+        else:
+            data_loaded_reason_flag.append({"loaded_flag": "Red", "reason": "Product is not being loaded"})
+ 
 
-    d = {"Name":loaded_files, "productLabel_reason_flag": productLabel_reason}
+    d = {"Name":json_files_new, "productLabel_reason_flag": productLabel_reason}
     data_productLabel_reason_flag = pd.DataFrame(d)
 
+    d2 = {"Name":json_files_new, "data_loaded_reason_flag": data_loaded_reason_flag}
+    data_loaded_reason_flag = pd.DataFrame(d2)
+
+
+
+    # data_productLabel_reason_flag.to_csv("prd.csv")
 
     dfs2 = [
     # data_loaded_reason_flag,
-            data_productLabel_reason_flag,
+            # data_productLabel_reason_flag,
             data_review_reason_flag, 
             data_title_reason_flag, 
             data_features_reason_flag, 
@@ -551,8 +578,11 @@ def finalResult():
             data_ReviewDateGreen_reason_flag, 
             data_nonRedReviewDate_reason_flag, 
             data_duplicate_reason_flag]
-    df_final_reason = reduce(lambda left,right: pd.merge(left,right,on='Name'), dfs2)
+    df_final_reason1 = reduce(lambda left,right: pd.merge(left,right,on='Name'), dfs2)
+    df_final_reason2 = data_loaded_reason_flag.merge(df_final_reason1,how = "left",on="Name")
+    df_final_reason = data_productLabel_reason_flag.merge(df_final_reason2,how = "left",on="Name")
 
+    
     count_RedProduct = df_final.loc[df_final.productLabel == "Red", "productLabel"].count()
     total_products = len(df_final.index)
     if total_products == count_RedProduct:
@@ -561,28 +591,31 @@ def finalResult():
         category_label = "Yellow"
     else:
         category_label = "Green"
+
+    
+    df_final_reason.to_csv(category_label+"_reason.csv")
+
     df_final.to_csv(category_label+".csv")
 
-    cols = [ "Name", "productLabel","loaded_flag",
-                        "review_flag",
-                        "title_flag",
-                        "features_flag",
-                        "rating_flag",
-                        "totalRatings_flag",
-                        "floatRating_flag",
-                        "nonRedRating_flag",
-                        "countReviewDate_flag_x",
-                        "countReviewDate_flag_y",
-                        "duplicate_flag"
+    cols = [ "Name", "productLabel_reason_flag","data_loaded_reason_flag",
+                        "review_reason_flag",
+                        "title_reason_flag",
+                        "features_reason_flag",
+                        "rating_reason_flag",
+                        "totalRatings_reason_flag",
+                        "floatRating_reason_flag",
+                        "nonRedRating_reason_flag",
+                        "countReviewDate_reason_flag_x",
+                        "countReviewDate_reason_flag_y",
+                        "duplicate_reason_flag"
                         ]
 
-    df_final = df_final[cols]
-
-    # df_final.to_csv(category_label+".csv")
-    df_final_reason.to_csv(category_label+".csv")
+    # df_final = df_final[cols]
+    df_final_reason = df_final_reason[cols]
+    
     # final_report2 =  pd.read_csv(category_label+".csv", index_col=0, squeeze=True, header=None).to_dict()
     # final_report2 = df_final.to_dict('dict')
-    final_report2 = df_final.set_index('Name').T.to_dict('list')
+    final_report2 = df_final_reason.set_index('Name').T.to_dict('list')
 
     heading_list = ["productLabel", 
                         "loaded_flag",
@@ -597,17 +630,21 @@ def finalResult():
                         "nonRedReviewDate_flag",
                         "duplicate_flag"
                         ]
-    product_results = []
+    # product_results = []
     for k, v in final_report2.items():
         # product_results.append(dict(zip(heading_list, v)))
         final_report2[k] = dict(zip(heading_list,v))
     final_report = {
         'category_slug': 'laptop',
         'status': category_label,
-        "product": product_results
+        "product": final_report2
     }
     with open('data.txt', 'w') as outfile:
         json.dump(final_report2, outfile)
+
+    with open('data_final.txt', 'w') as outfile:
+        json.dump(final_report, outfile)
+
     return time.time() - start_time
 
 # final_report2 =  pd.read_csv("test.csv", index_col=0, squeeze=True, header=0).to_dict()

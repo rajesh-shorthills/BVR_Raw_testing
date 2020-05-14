@@ -631,13 +631,13 @@ def finalResult():
                         "duplicate_flag"
                         ]
     # product_results = []
-    for k, v in final_report2.items():
-        # product_results.append(dict(zip(heading_list, v)))
-        final_report2[k] = dict(zip(heading_list,v))
+    # for k, v in final_report2.items():
+    #     product_results.append(dict(zip(heading_list, v)))
+    #     # final_report2[k] = dict(zip(heading_list,v))
     final_report = {
         'category_slug': 'laptop',
         'status': category_label,
-        "product": final_report2
+        "products": final_report2
     }
     with open('data.txt', 'w') as outfile:
         json.dump(final_report2, outfile)
@@ -646,6 +646,18 @@ def finalResult():
         json.dump(final_report, outfile)
 
     return time.time() - start_time
+
+
+# with open('data.txt', 'r') as outfile:
+#         abc = json.load(outfile)
+
+# final_report = {
+#         'category_slug': 'laptop',
+#         'status': "Green",
+#         "products": abc
+#     }
+# with open('data_final_check.txt', 'w') as outfile:
+#     json.dump(final_report, outfile)
 
 # final_report2 =  pd.read_csv("test.csv", index_col=0, squeeze=True, header=0).to_dict()
 # with open('data.txt', 'w') as outfile:

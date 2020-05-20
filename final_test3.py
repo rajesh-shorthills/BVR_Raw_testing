@@ -14,7 +14,7 @@ path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/anti
 '''
 Product - Reading file - Red
 '''
-
+category_slug_list = ['antibacterial-body-wash']
 json_files = [pos_json for pos_json in os.listdir(path_to_json) if pos_json.endswith('.json')]
 not_loaded_files = []
 loaded_files = []
@@ -629,7 +629,7 @@ def finalResult():
                         ]
 
     final_report = {
-        'category_slug': 'antibacterial',
+        'category_slug': category_slug_list[0],
         'status': category_label,
         "products": final_report2
     }

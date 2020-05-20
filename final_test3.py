@@ -522,7 +522,9 @@ def finalResult():
             test = df_final
             df_final = test.append({"Name": not_loaded, "loaded_flag": "Red"}, ignore_index = True)
             json_files_new.append(not_loaded)
-
+    else:
+        json_files_new  = copy.deepcopy(loaded_files)
+        
     df_final["productLabel"] = df_final.apply(lambda row: productLabel(row), axis = 1)
 
     data_review_reason_flag =  data_review_flag[1]

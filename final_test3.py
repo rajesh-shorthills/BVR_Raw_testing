@@ -1,4 +1,4 @@
-import os, json
+import os, json, shutil
 import dateparser
 import csv
 import pandas as pd
@@ -9,7 +9,7 @@ import copy
 from functools import reduce
 #path_to_json = input("Enter the folder address containing json files: ")
 #json_files = [pos_json for pos_json in os.listdir(path_to_json)]
-path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/antibacterial-body-wash/raw'
+path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/antibacterial-body-wash1/raw'
 
 '''
 Product - Reading file - Red
@@ -593,9 +593,9 @@ def finalResult():
         category_label = "Green"
 
     
-    df_final_reason.to_csv(category_label+"_reason.csv")
+    # df_final_reason.to_csv(category_label+"_reason.csv")
 
-    df_final.to_csv(category_label+".csv")
+    # df_final.to_csv(category_label+".csv")
 
     cols = [ "Name", "productLabel_reason_flag","data_loaded_reason_flag",
                         "review_reason_flag",
@@ -633,10 +633,19 @@ def finalResult():
         'status': category_label,
         "products": final_report2
     }
-    with open('data.json', 'w') as outfile:
-        json.dump(final_report2, outfile)
+    # with open('data.json', 'w') as outfile:
+    #     json.dump(final_report2, outfile)
 
-    with open('data_final.json', 'w') as outfile:
+    current_path = os.getcwd()
+    
+    saving_path = os.path.join(current_path, category_slug_list[0])
+
+    if os.path.exists(saving_path):
+        shutil.rmtree(saving_path)
+    os.makedirs(saving_path)
+
+
+    with open(os.path.join(saving_path, category_slug_list[0] + '.json'), 'w') as outfile:
         json.dump(final_report, outfile)
 
     return time.time() - start_time

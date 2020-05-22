@@ -9,12 +9,12 @@ import copy
 from functools import reduce
 #path_to_json = input("Enter the folder address containing json files: ")
 #json_files = [pos_json for pos_json in os.listdir(path_to_json)]
-path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/antibacterial-body-wash1/raw'
-
+# path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/antibacterial-body-wash1/raw'
+path_to_json = '/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/air-fryers1'
 '''
 Product - Reading file - Red
 '''
-category_slug_list = ['antibacterial-body-wash']
+category_slug_list = ['air-fryers']
 json_files = [pos_json for pos_json in os.listdir(path_to_json) if pos_json.endswith('.json')]
 not_loaded_files = []
 loaded_files = []
@@ -24,9 +24,14 @@ for eachFile in json_files:
     try:
         with open(os.path.join(path_to_json, eachFile)) as f:
             new_file = json.load(f)
-            loaded_full_files.append(new_file)
-            loaded_files.append(eachFile)
-            loaded_flag.append("Green")
+            try:
+                new_file['reviews']
+                loaded_full_files.append(new_file)
+                loaded_files.append(eachFile)
+                loaded_flag.append("Green")
+            except:
+                not_loaded_files.append(eachFile)
+                loaded_flag.append("Red")
     except ValueError:
         not_loaded_files.append(eachFile)
         loaded_flag.append("Red")

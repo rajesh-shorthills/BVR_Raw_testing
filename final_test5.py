@@ -250,9 +250,9 @@ def finalReport(path_to_json):
         try:
             with open(os.path.join(path_to_json, filename)) as f:
                 eachFile = json.load(f)
+                eachFile['reviews']
                 updated_eachFile = copy.deepcopy(eachFile)
                 try:
-                    eachFile['reviews']
                     loaded_full_files.append(eachFile)
                     loaded_files.append(filename)
                     loaded_flag.append("Green")
@@ -371,7 +371,7 @@ def finalReport(path_to_json):
                     duplicate_reason_flag.append(findingDuplicates_results[1])
                     duplicate_dict[filename] = findingDuplicates_results[2]   
 
-        except ValueError:
+        except:
             not_loaded_files.append(filename)
             loaded_flag.append("Red")
     
@@ -401,15 +401,11 @@ def finalReport(path_to_json):
             # json_files_new.append(not_loaded)
     # else:
         # json_files_new  = copy.deepcopy(ReadingFiles()[1])
-
-    # loaded_flag_list = d1_flags["loaded_flag"].tolist()
-    # loaded_reason_flag = []
-    # for element in loaded_flag_list:
-    #     if element == "":
-    #         loaded_reason_flag.append({"loaded_flag": "Green", "reason": ""})
-    #     else:
-    #         loaded_reason_flag.append({"loaded_flag": "Red", "reason": "Product is not being loaded"})
-    
+ 
+    d1_flags["loaded_flag"].fillna("Green", inplace = True) 
+    # d2_flags["loaded_flag"].fillna({"loaded_flag": "Green", "reason":""}, inplace = True)
+    # new_dict = {"loaded_flag": "Green", "reason": ""}
+    d2_flags["loaded_flag"].fillna('{"loaded_flag": "Green", "reason": ""}', inplace = True) 
 
     d1_flags["productLabel"] = d1_flags.apply(lambda row: productLabel(row), axis = 1)
 

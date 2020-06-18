@@ -12,7 +12,7 @@ import numpy as np
 '''
 Product - Reading file - Red
 '''
-category_slug_list = ['air-fryers']
+category_slug_list = ['baby-wipes']
 
 
 def missingReviewText(eachFile, filename):
@@ -398,16 +398,27 @@ def finalReport(path_to_json):
             # test = df_final
             d1_flags = d1_flags.append({"Name": not_loaded, "loaded_flag": "Red"}, ignore_index = True)
             d2_flags = d2_flags.append({"Name": not_loaded, "loaded_flag": {"loaded_flag": "Red", "reason":"Product is not being loaded"}}, ignore_index = True)
+    else:
+        d1_flags['loaded_flag'] = "Green"
+        d2_flags['loaded_flag'] = "{'loaded_flag': 'Green', 'reason': ""}"
             # json_files_new.append(not_loaded)
     # else:
         # json_files_new  = copy.deepcopy(ReadingFiles()[1])
- 
+    
+    # print(d1_flags)
+
+    # d1_flags.to_csv("d1.csv")
+    # d2_flags.to_csv("d12.csv")
     d1_flags["loaded_flag"].fillna("Green", inplace = True) 
     # d2_flags["loaded_flag"].fillna({"loaded_flag": "Green", "reason":""}, inplace = True)
     # new_dict = {"loaded_flag": "Green", "reason": ""}
+    
     d2_flags["loaded_flag"].fillna('{"loaded_flag": "Green", "reason": ""}', inplace = True) 
 
+    
     d1_flags["productLabel"] = d1_flags.apply(lambda row: productLabel(row), axis = 1)
+
+    
 
     productLabel_list = d1_flags["productLabel"].tolist()
     productLabel_reason = []
@@ -419,6 +430,7 @@ def finalReport(path_to_json):
         else:
             productLabel_reason.append({"productLabel": "Red", "reason": "At least one of the flag is Red"})
 
+    
     d2_flags["productLabel_reason"] = productLabel_reason
 
     count_RedProduct = d1_flags.loc[d1_flags.productLabel == "Red", "productLabel"].count()
@@ -432,6 +444,9 @@ def finalReport(path_to_json):
 
     final_report1 = d2_flags.set_index('Name').T.to_dict('list')
 
+
+
+    
     final_report = {
         'category_slug': category_slug_list[0],
         'status': category_label,
@@ -456,4 +471,4 @@ def finalReport(path_to_json):
 
     return time.time() - start_time
 
-print(finalReport('/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/Data/laptop/raw'))
+print(finalReport('/media/rupinder/C49A5A1B9A5A0A76/Users/Rupinder/Desktop/BVR/baby-wipes-in/raw'))
